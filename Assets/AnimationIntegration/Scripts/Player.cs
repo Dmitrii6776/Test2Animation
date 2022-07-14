@@ -14,6 +14,8 @@ public class Player : MonoBehaviour
     [SerializeField] private GameObject defaultWeapon;
     [SerializeField] private GameObject swordWeapon;
     [SerializeField] private GameObject currentWeapon;
+    [SerializeField] private float spineRotateLimit = 90;
+    
 
     private Animator _animator;
     private static readonly int IsRunningRifle = Animator.StringToHash("isRunningRifle");
@@ -23,6 +25,8 @@ public class Player : MonoBehaviour
     private static readonly int IsAttack = Animator.StringToHash("isAttack");
 
     private bool isPlayerCanMoving = true;
+    private float _angleX;
+    
 
 
 
@@ -32,7 +36,7 @@ public class Player : MonoBehaviour
     public void Move(Vector3 direction)
     {
         if(!isPlayerCanMoving) return;
-        SetDirection(direction);
+        // SetDirection(direction);
         SetDirectionAnimation(direction);
         transform.position += direction * movementSpeed * Time.deltaTime;
         
@@ -44,15 +48,20 @@ public class Player : MonoBehaviour
         if(!isPlayerCanMoving) return;
         rot.z = 10;
         var angle = targetBone.eulerAngles;
-        var playerRotation = transform.rotation;
+        var boneRotationX = targetBone.rotation.x;
         var objectPos = Camera.main.WorldToScreenPoint(transform.position);
         rot.x -= objectPos.x;
         rot.y -= objectPos.y;
 
         angle.y = Mathf.Atan2(rot.y, rot.x) * Mathf.Rad2Deg;
         angle.y = -angle.y;
+
         targetBone.rotation = Quaternion.Euler(angle);
- 
+        _angleX = UnityEditor.TransformUtils.GetInspectorRotation(targetBone).x;
+
+
+
+
     }
 
     public void Attack()
@@ -73,7 +82,21 @@ public class Player : MonoBehaviour
         angle.z = 0;
         transform.rotation = Quaternion.Euler(angle);
     }
-    
+
+    private void LateUpdate()
+    {
+        if (_angleX >= spineRotateLimit)
+        {
+            var playerRot = transform.eulerAngles.y - spineRotateLimit;
+            transform.rotation = Quaternion.Euler(0, playerRot, 0);
+        }
+
+        if (_angleX <= - spineRotateLimit)
+        {
+            var playerRot = transform.eulerAngles.y + spineRotateLimit;
+            transform.rotation = Quaternion.Euler(0, playerRot, 0);
+        }
+    }
 
 
     private void ChangeWeapon(GameObject weapon)
@@ -88,22 +111,22 @@ public class Player : MonoBehaviour
 
     }
 
-    private void SetDirection(Vector3 direction)
-    {
-        if (direction == Vector3.forward)
-        {
-            transform.rotation = Quaternion.Euler(0,0,0);
-        }
-        if (direction == Vector3.left)
-        {
-            transform.rotation = Quaternion.Euler(0,-90,0);
-        }
-        if (direction == Vector3.right)
-        {
-            transform.rotation = Quaternion.Euler(0,90,0);
-        }
-       
-    }
+    // private void SetDirection(Vector3 direction)
+    // {
+    //     if (direction == Vector3.forward)
+    //     {
+    //         transform.rotation = Quaternion.Euler(0,0,0);
+    //     }
+    //     if (direction == Vector3.left)
+    //     {
+    //         transform.rotation = Quaternion.Euler(0,-90,0);
+    //     }
+    //     if (direction == Vector3.right)
+    //     {
+    //         transform.rotation = Quaternion.Euler(0,90,0);
+    //     }
+    //    
+    // }
 
     private void SetDirectionAnimation(Vector3 direction)
     {

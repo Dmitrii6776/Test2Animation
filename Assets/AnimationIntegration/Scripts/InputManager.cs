@@ -33,7 +33,7 @@ public class InputManager : MonoBehaviour
 
             if (Input.GetKey(KeyCode.S))
             {
-                player.Move(-Vector3.forward);
+                player.Move(Vector3.back);
             }
 
             if (!player.canFinish) return;
