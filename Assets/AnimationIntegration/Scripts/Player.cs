@@ -5,16 +5,18 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public Transform targetBone;
+    [Header("Player Parameters")]
     public bool canFinish;
-
     [SerializeField] private int movementSpeed;
-    
+    [Header("Weapon Components")]
     [SerializeField] private GameObject weaponSpawnPoint;
     [SerializeField] private GameObject defaultWeapon;
     [SerializeField] private GameObject swordWeapon;
     [SerializeField] private GameObject currentWeapon;
+    [Header("Rotation elemets")]
+    [SerializeField] private Transform targetBone;
     [SerializeField] private float spineRotateLimit = 90;
+    [SerializeField] private Transform playerModel;
     
 
     private Animator _animator;
@@ -24,28 +26,30 @@ public class Player : MonoBehaviour
     private static readonly int IsRunningBack = Animator.StringToHash("isRunningBack");
     private static readonly int IsAttack = Animator.StringToHash("isAttack");
 
-    private bool isPlayerCanMoving = true;
+    private bool _isPlayerCanMove = true;
     private float _angleX;
+    private Vector3 _currentPlayerDirection;
+
+
+
+
     
-
-
-
-
-
 
     public void Move(Vector3 direction)
     {
-        if(!isPlayerCanMoving) return;
-        // SetDirection(direction);
-        SetDirectionAnimation(direction);
+        if(!_isPlayerCanMove) return;
+        var previousPos = transform.position;
         transform.position += direction * movementSpeed * Time.deltaTime;
-        
+        var currentPos = transform.position;
+        _currentPlayerDirection = (currentPos - previousPos).normalized;
+        SetDirectionAnimation(_currentPlayerDirection);
+
     }
 
     public void Rotate(Vector3 rot)
     {
 
-        if(!isPlayerCanMoving) return;
+        if(!_isPlayerCanMove) return;
         rot.z = 10;
         var angle = targetBone.eulerAngles;
         var boneRotationX = targetBone.rotation.x;
@@ -64,23 +68,29 @@ public class Player : MonoBehaviour
 
     }
 
+    public void ResetPlayerModelRotation()
+    {
+        playerModel.rotation = transform.rotation;
+    }
+
     public void Attack()
     {
         ChangeWeapon(swordWeapon);
         _animator.SetBool(IsAttack, true);
-        isPlayerCanMoving = false;
+        _isPlayerCanMove = false;
         StartCoroutine(nameof(ChangeWeaponDelay), 2f);
         StartCoroutine(nameof(ResetAttackFlag), 1);
 
     }
     public void SetAttackTarget(Transform target)
     {
-        transform.LookAt(target);
+        var tempTransform = playerModel;
+        tempTransform.LookAt(target);
 
-        var angle = transform.eulerAngles;
+        var angle = tempTransform.eulerAngles;
         angle.x = 0;
         angle.z = 0;
-        transform.rotation = Quaternion.Euler(angle);
+        playerModel.rotation = Quaternion.Euler(angle);
     }
 
     private void LateUpdate()
@@ -111,22 +121,6 @@ public class Player : MonoBehaviour
 
     }
 
-    // private void SetDirection(Vector3 direction)
-    // {
-    //     if (direction == Vector3.forward)
-    //     {
-    //         transform.rotation = Quaternion.Euler(0,0,0);
-    //     }
-    //     if (direction == Vector3.left)
-    //     {
-    //         transform.rotation = Quaternion.Euler(0,-90,0);
-    //     }
-    //     if (direction == Vector3.right)
-    //     {
-    //         transform.rotation = Quaternion.Euler(0,90,0);
-    //     }
-    //    
-    // }
 
     private void SetDirectionAnimation(Vector3 direction)
     {
@@ -161,10 +155,10 @@ public class Player : MonoBehaviour
         }
         if (direction == Vector3.zero)
         {
-            _animator.SetBool("isRunningRifle", false);
-            _animator.SetBool("isRunningLeft", false);
-            _animator.SetBool("isRunningRight", false);
-            _animator.SetBool("isRunningBack", false);
+            _animator.SetBool(IsRunningRifle, false);
+            _animator.SetBool(IsRunningLeft, false);
+            _animator.SetBool(IsRunningRight, false);
+            _animator.SetBool(IsRunningBack, false);
         }
 
 
@@ -174,13 +168,14 @@ public class Player : MonoBehaviour
     {
         yield return new WaitForSeconds(time);
         ChangeWeapon(defaultWeapon);
-        isPlayerCanMoving = true;
+        _isPlayerCanMove = true;
     }
     
     private IEnumerator ResetAttackFlag(int time)
     {
         yield return new WaitForSeconds(time);
         _animator.SetBool(IsAttack, false);
+        ;
     }
     
     

@@ -502,6 +502,8 @@ MonoBehaviour:
   swordWeapon: {fileID: 3498054180010475684, guid: 9baa78e058c0945fa9a903fae75bd32d, type: 3}
   currentWeapon: {fileID: 386750822}
   spineRotateLimit: 90
+  dir: {x: 0, y: 0, z: 0}
+  playerModel: {fileID: 539450016}
 --- !u!1 &614442654 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8359470385196568525, guid: 38ec3b340a032704c9dbac1eada86ef3, type: 3}
@@ -3025,7 +3027,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 584555203}
-  sensativity: 10
 --- !u!4 &2037469085
 Transform:
   m_ObjectHideFlags: 0

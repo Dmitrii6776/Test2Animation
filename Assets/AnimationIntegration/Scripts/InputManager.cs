@@ -6,7 +6,6 @@ using UnityEngine;
 public class InputManager : MonoBehaviour
 {
     [SerializeField] private Player player;
-    [SerializeField] private int sensativity = 10;
     private Vector3 _turn;
 
 
@@ -50,10 +49,7 @@ public class InputManager : MonoBehaviour
 
     private void MouseInput()
     {
-
-        // _turn.x += Input.GetAxis("Mouse X");
-        // _turn.y += Input.GetAxis("Mouse Y");
-        // _turn = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        
         _turn = Input.mousePosition;
         player.Rotate(_turn);
         

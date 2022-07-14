@@ -35,6 +35,7 @@ public class UserInterface : MonoBehaviour
         {
             finishButton.SetActive(false);
             player.canFinish = false;
+            player.ResetPlayerModelRotation();
         }
     }
 }
